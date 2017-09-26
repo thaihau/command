@@ -1,0 +1,5 @@
+command:
+  commands:
+    sendMessage: "yowsup-cli demos -d -E android --config %s -s %d \"%s\""
+    date: "date"
+
