@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +22,8 @@ import tech.th.command.config.CommandProperties;
 @RequestMapping(path = "/command")
 public class CommandController {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(CommandController.class);
+
   private CommandProperties properties;
 
   public CommandController(final CommandProperties properties) {
@@ -32,7 +36,7 @@ public class CommandController {
     try {
 
       final String commandFormat = properties.getCommands().get(command);
-      System.out.println("sendMessagePattern>>>" + commandFormat);
+      LOGGER.info("sendMessagePattern>>>{}" , commandFormat);
 
       if (commandFormat == null) {
         throw new IllegalArgumentException("Invalid command");
@@ -42,13 +46,13 @@ public class CommandController {
       final String commandRequest =
           String.format(commandFormat, message.getConfig(), message.getNumber(),
               message.getContent());
-      System.out.println("sendMessageCommand>>>" + commandRequest);
+      LOGGER.info("sendMessageCommand>>>{}" , commandRequest);
       String result = executeCommand(commandRequest);
-      System.out.println("result>" + result);
+      LOGGER.info("result>{}" , result);
       message.setResult(result);
       return ResponseEntity.accepted().body(message);
     } catch (IOException | InterruptedException e) {
-      e.printStackTrace();
+      LOGGER.error("encounter exception",e);
       throw e;
     }
   }
@@ -79,7 +83,6 @@ public class CommandController {
     if (exitStatus != 0) {
       throw new IllegalStateException(output.toString());
     }
-
     return output.toString();
 
   }
